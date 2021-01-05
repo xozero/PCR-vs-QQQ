@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Historical P/C Ratio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<style>
+figure {
+    width: 95%;
+}
+input, button {
+    padding: 5px;
+}
+.logo, .logo img {
+    width: 100%;
+}
+</style>
+</head>
+<body>
+<div class='logo'><img alt='wsb' src='/static/wsb.png'></div>
+<figure class="highcharts-figure">
+    <div id="container1"></div>
+    <div id="container2"></div>
+</figure>
+
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script>
+['mousemove', 'touchmove', 'touchstart'].forEach(function(eventType) {
+  for (let j = 1; j <= 2; j++) {
+    document.getElementById('container' + j).addEventListener(
+      eventType,
+      function(e) {
+        var chart, point, i, event;
+        Highcharts.charts.forEach(chart => {
+          event = chart.pointer.normalize(e);
+          point = chart.series[0].searchPoint(event, true);
+          if (point) {
+            point.highlight(e);
+          }
+        })
+      }
+    );
+  }
+});
+
+Highcharts.Pointer.prototype.reset = function() {
+  return null;
+};
+
+Highcharts.Point.prototype.highlight = function(event) {
+  event = this.series.chart.pointer.normalize(event);
+  this.onMouseOver(); // Show the hover marker
+  this.series.chart.tooltip.refresh([this]); // Show the tooltip
+  this.series.chart.xAxis[0].drawCrosshair(event, this); // Show the crosshair
+};
+
+
+Highcharts.stockChart('container1', {
+    chart: {
+        zoomType: 'x'
+    },
+    rangeSelector: {
+        enabled: true,
+        allButtonsEnabled: true,
+        selected: 1
+    },
+    title: {
+        text: 'Equity P/C Ratio'
+    },
+    subtitle: {
+        text: "It's QUITE interesting.."
+    },
+    xAxis: {
+        type: 'datetime'
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Equity P/C Ratio'
+        }
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        },
+        line: {
+            marker: {
+                enabled: false
+            }
+        }
+    },
+    credits: { enabled: false },
+    series: [
+        {
+            name: 'Equity P/C Ratio',
+            data: {{ pcr_data }},
+            color: '#057807',
+            tooltip: {
+                valueDecimals: 2
+            },
+        }
+    ]
+});
+
+Highcharts.stockChart('container2', {
+    chart: {
+        zoomType: 'xy'
+    },
+    rangeSelector: {
+        enabled: true,
+        allButtonsEnabled: true,
+        selected: 1
+    },
+    title: {
+        text: 'QQQ'
+    },
+    subtitle: {
+        text: "It's QUITE interesting.."
+    },
+    xAxis: {
+        type: 'datetime'
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Price'
+        }
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        },
+        line: {
+            marker: {
+                enabled: false
+            }
+        }
+    },
+    credits: { enabled: false },
+    series: [
+        {
+            name: 'QQQ',
+            type: 'line',
+            data: {{ qqq_data }},
+            color: '#000080',
+            tooltip: {
+                valueDecimals: 2
+            }
+        }
+    ]
+});
+</script>
+</body>
+</html>
